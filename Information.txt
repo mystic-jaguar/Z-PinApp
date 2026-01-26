@@ -1,0 +1,387 @@
+Z-PIN DELIVERY PARTNER APP - INFORMATION REFERENCE GUIDE
+========================================================
+
+This document provides detailed information about which functions, components, and values reference which files throughout the entire project.
+
+## PROJECT STRUCTURE OVERVIEW
+============================
+
+### Core Configuration Files:
+- App.tsx - Main app entry point
+- app.json - Expo configuration
+- package.json - Dependencies and scripts
+- tsconfig.json - TypeScript configuration
+
+### Source Code Structure:
+- src/types/index.ts - TypeScript interfaces and types
+- src/constants/theme.ts - Design system constants
+- src/context/ - React Context providers
+- src/navigation/ - Navigation configuration
+- src/screens/ - Screen components
+- src/components/ - Reusable components
+
+## DETAILED FILE REFERENCES
+===========================
+
+### 1. App.tsx (Main Entry Point)
+IMPORTS FROM:
+- expo-status-bar: StatusBar component
+- @react-navigation/native: NavigationContainer
+- react-native-safe-area-context: SafeAreaProvider
+- ./src/context/AuthContext: AuthProvider
+- ./src/context/OrderContext: OrderProvider
+- ./src/navigation/RootNavigator: RootNavigator
+
+FUNCTION REFERENCES:
+- App() - Main app component that wraps entire application
+- Uses SafeAreaProvider for safe area handling
+- Uses AuthProvider for authentication state management
+- Uses OrderProvider for order state management
+- Uses NavigationContainer for navigation
+- Uses StatusBar with style="light" and transparent background
+
+### 2. src/types/index.ts (Type Definitions)
+EXPORTS:
+- User interface - Referenced by AuthContext, HomeScreen, ProfileScreen
+- Order interface - Referenced by OrderContext, OrdersScreen, OrderCard, HomeScreen
+- OrderItem interface - Referenced by Order interface
+- Location interface - Referenced by Order interface
+- Earning interface - Referenced by EarningsScreen
+- Document interface - Referenced by DocumentsScreen
+
+TYPE USAGE ACROSS PROJECT:
+- User type used in: AuthContext.tsx, HomeScreen.tsx, ProfileScreen.tsx
+- Order type used in: OrderContext.tsx, OrdersScreen.tsx, OrderCard.tsx, HomeScreen.tsx, OrderDetailScreen.tsx, NavigationScreen.tsx
+- Earning type used in: EarningsScreen.tsx
+- Document type used in: DocumentsScreen.tsx
+
+### 3. src/constants/theme.ts (Design System)
+EXPORTS:
+- COLORS object - Used in ALL screen and component files
+- FONTS object - Used in ALL screen and component files
+- SPACING object - Used in ALL screen and component files
+- BORDER_RADIUS object - Used in ALL screen and component files
+
+REFERENCED BY:
+- HomeScreen.tsx - Uses COLORS, FONTS, SPACING, BORDER_RADIUS for styling
+- OrdersScreen.tsx - Uses COLORS, FONTS, SPACING, BORDER_RADIUS for styling
+- EarningsScreen.tsx - Uses COLORS, FONTS, SPACING, BORDER_RADIUS for styling
+- ProfileScreen.tsx - Uses COLORS, FONTS, SPACING, BORDER_RADIUS for styling
+- OrderCard.tsx - Uses COLORS, FONTS, SPACING, BORDER_RADIUS for styling
+- RootNavigator.tsx - Uses COLORS for navigation styling
+- LoginScreen.tsx - Uses theme constants for styling
+- SignupScreen.tsx - Uses theme constants for styling
+- All other screen components use these constants
+
+### 4. src/context/AuthContext.tsx (Authentication State)
+IMPORTS FROM:
+- react: createContext, useContext, useState, ReactNode
+- ../types: User interface
+
+EXPORTS:
+- AuthContext - Context object
+- AuthProvider - Context provider component
+- useAuth - Custom hook for accessing auth context
+
+INTERNAL REFERENCES:
+- mockUser object - Hardcoded user data for development
+- AuthContextType interface - Defines context shape
+
+USED BY:
+- App.tsx - Wraps app with AuthProvider
+- RootNavigator.tsx - Uses useAuth hook to check authentication
+- HomeScreen.tsx - Uses useAuth for user data and online status
+- ProfileScreen.tsx - Uses useAuth for user profile data
+- LoginScreen.tsx - Uses useAuth for login function
+- SignupScreen.tsx - Uses useAuth for signup function
+
+FUNCTIONS PROVIDED:
+- setUser() - Updates user state
+- toggleOnline() - Toggles online/offline status
+- login() - Authenticates user with email/password
+- signup() - Creates new user account
+- logout() - Clears user session
+
+### 5. src/context/OrderContext.tsx (Order State Management)
+IMPORTS FROM:
+- react: createContext, useContext, useState, ReactNode
+- ../types: Order interface
+
+EXPORTS:
+- OrderContext - Context object
+- OrderProvider - Context provider component
+- useOrders - Custom hook for accessing order context
+
+INTERNAL REFERENCES:
+- mockOrders array - Hardcoded order data for development
+- OrderContextType interface - Defines context shape
+
+USED BY:
+- App.tsx - Wraps app with OrderProvider
+- HomeScreen.tsx - Uses useOrders for pending orders and active order
+- OrdersScreen.tsx - Uses useOrders for order list and actions
+- OrderDetailScreen.tsx - Uses useOrders for order details
+- NavigationScreen.tsx - Uses useOrders for active order navigation
+
+FUNCTIONS PROVIDED:
+- setActiveOrder() - Sets currently active order
+- acceptOrder() - Accepts a pending order
+- pickupOrder() - Marks order as picked up
+- deliverOrder() - Marks order as delivered
+- rejectOrder() - Rejects a pending order
+
+### 6. src/navigation/RootNavigator.tsx (Navigation Configuration)
+IMPORTS FROM:
+- @react-navigation/bottom-tabs: createBottomTabNavigator
+- @react-navigation/stack: createStackNavigator
+- @expo/vector-icons: Ionicons
+- react-native-safe-area-context: useSafeAreaInsets
+- ../constants/theme: COLORS
+- ../context/AuthContext: useAuth
+- All screen components from ../screens/
+
+EXPORTS:
+- RootNavigator - Main navigation component
+
+INTERNAL REFERENCES:
+- Tab navigator for authenticated users
+- Stack navigator for authentication screens
+- OrdersStack - Stack navigator for order-related screens
+- ProfileStack - Stack navigator for profile-related screens
+
+NAVIGATION STRUCTURE:
+- Unauthenticated: Login -> Signup
+- Authenticated: Home, Orders, Earnings, Profile (bottom tabs)
+- Orders Stack: OrdersList -> OrderDetail -> Navigation
+- Profile Stack: ProfileMain -> Documents, Settings, HelpSupport, BankAccount
+
+USED BY:
+- App.tsx - Main navigation component
+
+### 7. src/screens/HomeScreen.tsx (Dashboard Screen)
+IMPORTS FROM:
+- react: useState
+- react-native: View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Dimensions
+- @expo/vector-icons: Ionicons
+- ../constants/theme: COLORS, SPACING, BORDER_RADIUS, FONTS
+- ../context/AuthContext: useAuth
+- ../context/OrderContext: useOrders
+- ../components/OrderCard: OrderCard
+
+INTERNAL STATE:
+- todayStats - Mock statistics for today's performance
+
+FUNCTIONS:
+- HomeScreen() - Main component function
+- Uses navigation prop for screen navigation
+
+REFERENCES:
+- user data from AuthContext
+- isOnline status from AuthContext
+- toggleOnline function from AuthContext
+- pendingOrders from OrderContext
+- activeOrder from OrderContext
+- acceptOrder function from OrderContext
+- rejectOrder function from OrderContext
+
+UI COMPONENTS USED:
+- ScrollView for main container
+- Switch for online/offline toggle
+- TouchableOpacity for interactive elements
+- OrderCard for displaying orders
+
+### 8. src/screens/OrdersScreen.tsx (Orders List Screen)
+IMPORTS FROM:
+- react: useState
+- react-native: View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl
+- ../constants/theme: COLORS, SPACING, BORDER_RADIUS, FONTS
+- ../context/OrderContext: useOrders
+- ../types: Order
+- ../components/OrderCard: OrderCard
+
+INTERNAL STATE:
+- filter - Current filter type (all, active, completed)
+- refreshing - Pull-to-refresh state
+
+FUNCTIONS:
+- OrdersScreen() - Main component function
+- onRefresh() - Handles pull-to-refresh
+- handleOrderPress() - Navigates to order detail
+- renderOrder() - Renders individual order item
+
+REFERENCES:
+- orders from OrderContext
+- activeOrder from OrderContext
+- acceptOrder function from OrderContext
+- rejectOrder function from OrderContext
+
+UI COMPONENTS USED:
+- FlatList for orders list
+- TouchableOpacity for filter tabs and order items
+- RefreshControl for pull-to-refresh
+- OrderCard for displaying orders
+
+### 9. src/screens/EarningsScreen.tsx (Earnings Dashboard)
+IMPORTS FROM:
+- react: useState
+- react-native: View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions
+- @expo/vector-icons: Ionicons
+- ../constants/theme: COLORS, SPACING, BORDER_RADIUS, FONTS
+- ../types: Earning
+
+INTERNAL STATE:
+- period - Current period filter (today, week, month)
+
+INTERNAL DATA:
+- mockEarnings - Array of earning objects for development
+- weeklyData - Chart data for weekly earnings
+- totalEarnings - Earnings summary by period
+- stats - Performance statistics
+
+FUNCTIONS:
+- EarningsScreen() - Main component function
+
+UI COMPONENTS USED:
+- ScrollView for main container
+- TouchableOpacity for period tabs and payout button
+- Custom chart implementation using View components
+
+### 10. src/components/OrderCard.tsx (Reusable Order Component)
+IMPORTS FROM:
+- react-native: View, Text, StyleSheet, TouchableOpacity
+- @expo/vector-icons: Ionicons
+- ../constants/theme: COLORS, SPACING, BORDER_RADIUS, FONTS
+- ../types: Order
+
+PROPS INTERFACE:
+- OrderCardProps - Defines component props
+  - order: Order (required)
+  - isActive: boolean (optional)
+  - onAccept: function (optional)
+  - onReject: function (optional)
+
+FUNCTIONS:
+- OrderCard() - Main component function
+- getStatusColor() - Returns color based on order status
+
+USED BY:
+- HomeScreen.tsx - Displays active order and pending orders
+- OrdersScreen.tsx - Displays orders in list
+
+UI FEATURES:
+- Status badge with dynamic colors
+- Route visualization with pickup/delivery points
+- Order statistics (items, distance, time)
+- Action buttons for accept/reject (when applicable)
+
+### 11. Other Screen Components
+All screen components follow similar patterns:
+
+COMMON IMPORTS:
+- react: useState, useEffect (when needed)
+- react-native: View, Text, StyleSheet, ScrollView, TouchableOpacity
+- @expo/vector-icons: Ionicons
+- ../constants/theme: All theme constants
+- Context hooks when needed
+
+SCREEN-SPECIFIC REFERENCES:
+- LoginScreen.tsx: Uses useAuth for login function
+- SignupScreen.tsx: Uses useAuth for signup function
+- ProfileScreen.tsx: Uses useAuth for user data
+- DocumentsScreen.tsx: Uses Document type from types
+- SettingsScreen.tsx: Uses useAuth for user preferences
+- NavigationScreen.tsx: Uses useOrders for active order
+- OrderDetailScreen.tsx: Uses Order type and useOrders
+- BankAccountScreen.tsx: Standalone component for bank details
+- HelpSupportScreen.tsx: Standalone support component
+
+## DEPENDENCY FLOW
+==================
+
+### Data Flow:
+1. Types (index.ts) → Contexts → Screens → Components
+2. Theme (theme.ts) → All UI components for styling
+3. Contexts → Screens for state management
+4. Navigation → Screens for routing
+
+### Component Hierarchy:
+App.tsx
+├── AuthProvider (AuthContext)
+├── OrderProvider (OrderContext)
+└── NavigationContainer
+    └── RootNavigator
+        ├── LoginScreen (if not authenticated)
+        ├── SignupScreen (if not authenticated)
+        └── TabNavigator (if authenticated)
+            ├── HomeScreen
+            ├── OrdersStack
+            │   ├── OrdersScreen
+            │   ├── OrderDetailScreen
+            │   └── NavigationScreen
+            ├── EarningsScreen
+            └── ProfileStack
+                ├── ProfileScreen
+                ├── DocumentsScreen
+                ├── SettingsScreen
+                ├── HelpSupportScreen
+                └── BankAccountScreen
+
+### State Management Flow:
+1. AuthContext manages user authentication and profile data
+2. OrderContext manages order state and actions
+3. Local state in components for UI-specific data
+4. Props passed down for component communication
+
+### Styling System:
+- All components import theme constants from theme.ts
+- Consistent color scheme using COLORS object
+- Standardized spacing using SPACING object
+- Uniform border radius using BORDER_RADIUS object
+- Typography system using FONTS object
+
+## EXTERNAL DEPENDENCIES
+========================
+
+### React Native & Expo:
+- expo-status-bar: Status bar configuration
+- @react-navigation/native: Navigation core
+- @react-navigation/bottom-tabs: Tab navigation
+- @react-navigation/stack: Stack navigation
+- react-native-safe-area-context: Safe area handling
+- @expo/vector-icons: Icon library (Ionicons)
+
+### Development Dependencies:
+- TypeScript for type safety
+- React Native for mobile development
+- Expo for development tooling
+
+## API INTEGRATION POINTS
+=========================
+
+Based on the API documentation, the following screens will integrate with backend APIs:
+
+### Authentication Screens:
+- LoginScreen.tsx → POST /api/v1/auth/partner/login
+- SignupScreen.tsx → POST /api/v1/auth/partner/signup
+
+### Home Screen:
+- HomeScreen.tsx → GET /api/v1/partner/orders/available
+- HomeScreen.tsx → POST /api/v1/partner/orders/:id/accept
+- HomeScreen.tsx → POST /api/v1/partner/orders/:id/reject
+
+### Orders Screen:
+- OrdersScreen.tsx → GET /api/v1/partner/orders
+- OrderDetailScreen.tsx → PUT /api/v1/partner/orders/:id/status
+
+### Earnings Screen:
+- EarningsScreen.tsx → GET /api/v1/partner/earnings
+- EarningsScreen.tsx → GET /api/v1/partner/earnings/summary
+
+### Profile Screens:
+- ProfileScreen.tsx → GET /api/v1/partner/profile
+- ProfileScreen.tsx → PUT /api/v1/partner/profile
+- DocumentsScreen.tsx → GET /api/v1/partner/documents
+- DocumentsScreen.tsx → POST /api/v1/partner/documents
+- BankAccountScreen.tsx → GET /api/v1/partner/bank-accounts
+
+This information guide provides a complete reference for understanding the codebase structure, dependencies, and data flow throughout the Z-Pin delivery partner application.

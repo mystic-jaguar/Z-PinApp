@@ -1,0 +1,975 @@
+# Z-Pin Delivery Partner App - API Documentation
+
+Base URL (for localhost): "http://localhost:5000/api/v1/"
+Base URL (for render deployed): "https://zpin-delivery-backend-997x.onrender.com/api/v1/"
+
+## Data Objects
+
+### Delivery Partner Object
+```json
+{
+  "id": "partner_123",
+  "name": "Rahul Sharma",
+  "mobile": "9876543210",
+  "email": "rahul@example.com",
+  "profileImage": "https://cloudinary.com/image_url",
+  "isOnline": true,
+  "isVerified": true,
+  "vehicleType": "bike", // bike, scooter, car
+  "vehicleNumber": "MH01AB1234",
+  "currentLocation": {
+    "type": "Point",
+    "coordinates": [72.8294, 19.0544] // [longitude, latitude]
+  },
+  "rating": 4.8,
+  "totalDeliveries": 1250,
+  "joinedDate": "2025-01-15T10:00:00Z",
+  "status": "active", // active, inactive, suspended
+  "timeStamp": "2025-11-29T10:00:00Z"
+}
+```
+
+### Order Object (For Delivery Partners)
+```json
+{
+  "orderId": "order_123",
+  "orderNumber": "ORD-2025-001234",
+  "customerId": "customer_456",
+  "customerName": "John Doe",
+  "customerPhone": "9876543210",
+  "pickupAddress": {
+    "name": "ABC Store",
+    "phone": "9876543211",
+    "address": "Shop 15, Linking Road, Bandra West",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "pincode": "400050",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [72.8294, 19.0544]
+    },
+    "landmark": "Near Metro Station"
+  },
+  "deliveryAddress": {
+    "name": "John Doe",
+    "phone": "9876543210",
+    "address": "123 Main St, Apartment 4B",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "pincode": "400001",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [72.8777, 19.0760]
+    },
+    "landmark": "Near Coffee Shop"
+  },
+  "items": [
+    {
+      "productName": "Wireless Headphones",
+      "quantity": 2,
+      "price": 2999.99,
+      "image": "https://cloudinary.com/product1.jpg"
+    }
+  ],
+  "totalAmount": 7273.96,
+  "deliveryFee": 50.00,
+  "partnerEarning": 35.00,
+  "distance": 5.2, // km
+  "estimatedTime": 25, // minutes
+  "status": "assigned", // assigned, accepted, picked_up, in_transit, delivered, cancelled
+  "paymentMethod": "online", // online, cod
+  "paymentStatus": "paid", // paid, pending
+  "specialInstructions": "Handle with care",
+  "otp": "1234", // for delivery verification
+  "assignedAt": "2025-11-29T10:00:00Z",
+  "acceptedAt": null,
+  "pickedUpAt": null,
+  "deliveredAt": null,
+  "timeStamp": "2025-11-29T10:00:00Z"
+}
+```
+
+### Earning Object
+```json
+{
+  "id": "earning_123",
+  "partnerId": "partner_456",
+  "orderId": "order_789",
+  "orderNumber": "ORD-2025-001234",
+  "baseAmount": 35.00,
+  "tip": 10.00,
+  "incentive": 5.00,
+  "bonus": 0.00,
+  "totalAmount": 50.00,
+  "distance": 5.2,
+  "deliveryTime": 25, // minutes
+  "date": "2025-11-29T10:00:00Z",
+  "status": "credited", // pending, credited, failed
+  "payoutId": "payout_123" // if included in payout
+}
+```
+
+### Payout Object
+```json
+{
+  "id": "payout_123",
+  "partnerId": "partner_456",
+  "amount": 2500.00,
+  "earnings": ["earning_123", "earning_456"], // array of earning IDs
+  "bankAccount": {
+    "accountNumber": "****1234",
+    "ifscCode": "HDFC0001234",
+    "accountHolderName": "Rahul Sharma"
+  },
+  "status": "processing", // pending, processing, completed, failed
+  "requestedAt": "2025-11-29T10:00:00Z",
+  "processedAt": null,
+  "transactionId": "TXN123456789",
+  "failureReason": null
+}
+```
+
+### Document Object
+```json
+{
+  "id": "doc_123",
+  "partnerId": "partner_456",
+  "type": "driving_license", // driving_license, aadhar, pan, vehicle_rc, insurance
+  "documentNumber": "DL1420110012345",
+  "imageUrl": "https://cloudinary.com/doc_image.jpg",
+  "status": "verified", // pending, verified, rejected
+  "verifiedAt": "2025-11-29T10:00:00Z",
+  "expiryDate": "2030-11-29",
+  "rejectionReason": null,
+  "uploadedAt": "2025-11-29T10:00:00Z"
+}
+```
+
+## Authentication APIs
+
+### 1. POST - /api/v1/auth/partner/signup
+Creates a new delivery partner account.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "name": "string",
+  "mobile": "string", // 10 digits
+  "email": "string",
+  "password": "string",
+  "vehicleType": "string", // bike, scooter, car
+  "vehicleNumber": "string",
+  "city": "string"
+}
+```
+- **Headers**: Content-Type: application/json
+- **Success Response**:
+  - Code: 201
+  - Content: { "partner": {<partner_object>}, "message": "Account created successfully" }
+- **Error Response**:
+  - Code: 400
+  - Content: { "error": "Partner already exists with this mobile" }
+
+### 2. POST - /api/v1/auth/partner/login
+Authenticates delivery partner and returns token.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "mobile": "string", // or email
+  "password": "string"
+}
+```
+- **Headers**: Content-Type: application/json
+- **Success Response**:
+  - Code: 200
+  - Content: { "success": true, "partner": {<partner_object>}, "token": "jwt_token" }
+- **Error Response**:
+  - Code: 401
+  - Content: { "success": false, "message": "Invalid credentials" }
+
+### 3. POST - /api/v1/auth/partner/sendOTP
+Sends OTP for mobile verification.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "mobile": "string"
+}
+```
+- **Headers**: Content-Type: application/json
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "OTP sent successfully" }
+
+### 4. POST - /api/v1/auth/partner/verifyOTP
+Verifies OTP for mobile verification.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "mobile": "string",
+  "otp": "string"
+}
+```
+- **Headers**: Content-Type: application/json
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "OTP verified successfully", "verified": true }
+
+## Partner Profile APIs
+
+### 5. GET - /api/v1/partner/profile
+Returns partner profile information.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "partner": {<partner_object>} }
+
+### 6. PUT - /api/v1/partner/profile
+Updates partner profile information.
+- **URL Params**: None
+- **Data Params** (multipart/form-data):
+```json
+{
+  "name": "string",
+  "email": "string",
+  "vehicleType": "string",
+  "vehicleNumber": "string",
+  "profileImage": "File" // optional
+}
+```
+- **Headers**: 
+  - Content-Type: multipart/form-data
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Profile updated successfully" }
+
+### 7. POST - /api/v1/partner/location
+Updates partner's current location.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "latitude": "number",
+  "longitude": "number"
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Location updated successfully" }
+
+### 8. PUT - /api/v1/partner/status
+Updates partner's online/offline status.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "isOnline": "boolean"
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Status updated successfully", "isOnline": true }
+
+## Order Management APIs
+
+### 9. GET - /api/v1/partner/orders/available
+Returns available orders for assignment based on partner location.
+- **URL Params**: 
+  - Optional: radius=[number] (default: 10km)
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "orders": [{<order_object>}], "count": 5 }
+
+### 10. GET - /api/v1/partner/orders
+Returns partner's assigned/accepted orders with pagination.
+- **URL Params**: 
+  - Optional: page=[number], limit=[number], status=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "orders": [{<order_object>}], "pagination": {<pagination_object>} }
+
+### 11. GET - /api/v1/partner/orders/:id
+Returns specific order details.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "order": {<order_object>} }
+
+### 12. POST - /api/v1/partner/orders/:id/accept
+Accepts an assigned order.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Order accepted successfully", "order": {<order_object>} }
+
+### 13. POST - /api/v1/partner/orders/:id/reject
+Rejects an assigned order.
+- **URL Params**: Required: id=[string]
+- **Data Params**:
+```json
+{
+  "reason": "string" // optional
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Order rejected successfully" }
+
+### 14. PUT - /api/v1/partner/orders/:id/status
+Updates order status during delivery process.
+- **URL Params**: Required: id=[string]
+- **Data Params**:
+```json
+{
+  "status": "string", // picked_up, in_transit, delivered
+  "latitude": "number", // current location
+  "longitude": "number",
+  "notes": "string", // optional
+  "otp": "string" // required for delivery confirmation
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Order status updated successfully", "order": {<order_object>} }
+
+### 15. POST - /api/v1/partner/orders/:id/issue
+Reports an issue with the order.
+- **URL Params**: Required: id=[string]
+- **Data Params**:
+```json
+{
+  "issueType": "string", // customer_unavailable, wrong_address, payment_issue, damaged_item
+  "description": "string",
+  "images": ["string"] // optional image URLs
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Issue reported successfully", "issueId": "issue_123" }
+
+## Earnings APIs
+
+### 16. GET - /api/v1/partner/earnings
+Returns partner's earnings with filtering options.
+- **URL Params**: 
+  - Optional: period=[string] (today, week, month), page=[number], limit=[number]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: 
+```json
+{
+  "earnings": [{<earning_object>}],
+  "summary": {
+    "totalEarnings": 7644.00,
+    "totalDeliveries": 84,
+    "totalTips": 890.00,
+    "totalIncentives": 620.00,
+    "averagePerDelivery": 91.00
+  },
+  "pagination": {<pagination_object>}
+}
+```
+
+### 17. GET - /api/v1/partner/earnings/summary
+Returns earnings summary for different periods.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "today": {
+    "earnings": 856.00,
+    "deliveries": 12,
+    "tips": 125.00,
+    "incentives": 85.00
+  },
+  "week": {
+    "earnings": 7644.00,
+    "deliveries": 84,
+    "tips": 890.00,
+    "incentives": 620.00
+  },
+  "month": {
+    "earnings": 28540.00,
+    "deliveries": 312,
+    "tips": 3240.00,
+    "incentives": 2180.00
+  }
+}
+```
+
+### 18. GET - /api/v1/partner/earnings/weekly-chart
+Returns weekly earnings breakdown for chart display.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "weeklyData": [
+    { "day": "Mon", "amount": 856, "deliveries": 12 },
+    { "day": "Tue", "amount": 1024, "deliveries": 14 },
+    { "day": "Wed", "amount": 768, "deliveries": 10 }
+  ]
+}
+```
+
+## Payout APIs
+
+### 19. GET - /api/v1/partner/payouts
+Returns partner's payout history.
+- **URL Params**: 
+  - Optional: page=[number], limit=[number], status=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "payouts": [{<payout_object>}], "pagination": {<pagination_object>} }
+
+### 20. GET - /api/v1/partner/payouts/available
+Returns available amount for payout.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: 
+```json
+{
+  "availableAmount": 2500.00,
+  "pendingEarnings": 150.00,
+  "lastPayoutDate": "2025-11-22T10:00:00Z",
+  "minimumPayout": 500.00
+}
+```
+
+### 21. POST - /api/v1/partner/payouts/request
+Requests payout for available earnings.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "amount": "number", // optional, defaults to full available amount
+  "bankAccountId": "string" // bank account ID for payout
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 201
+  - Content: { "message": "Payout requested successfully", "payout": {<payout_object>} }
+
+## Bank Account APIs
+
+### 22. GET - /api/v1/partner/bank-accounts
+Returns partner's saved bank accounts.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: 
+```json
+{
+  "bankAccounts": [
+    {
+      "id": "bank_123",
+      "accountNumber": "****1234",
+      "ifscCode": "HDFC0001234",
+      "bankName": "HDFC Bank",
+      "accountHolderName": "Rahul Sharma",
+      "accountType": "savings",
+      "isVerified": true,
+      "isPrimary": true
+    }
+  ]
+}
+```
+
+### 23. POST - /api/v1/partner/bank-accounts
+Adds new bank account.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "accountNumber": "string",
+  "ifscCode": "string",
+  "accountHolderName": "string",
+  "accountType": "string" // savings, current
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 201
+  - Content: { "message": "Bank account added successfully" }
+
+### 24. POST - /api/v1/partner/bank-accounts/:id/verify
+Verifies bank account using penny drop.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Bank account verified successfully", "verified": true }
+
+## Document Management APIs
+
+### 25. GET - /api/v1/partner/documents
+Returns partner's uploaded documents.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "documents": [{<document_object>}] }
+
+### 26. POST - /api/v1/partner/documents
+Uploads new document.
+- **URL Params**: None
+- **Data Params** (multipart/form-data):
+```json
+{
+  "type": "string", // driving_license, aadhar, pan, vehicle_rc, insurance
+  "documentNumber": "string",
+  "expiryDate": "string", // YYYY-MM-DD, optional
+  "documentImage": "File"
+}
+```
+- **Headers**: 
+  - Content-Type: multipart/form-data
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 201
+  - Content: { "message": "Document uploaded successfully", "document": {<document_object>} }
+
+### 27. PUT - /api/v1/partner/documents/:id
+Updates existing document.
+- **URL Params**: Required: id=[string]
+- **Data Params** (multipart/form-data):
+```json
+{
+  "documentNumber": "string",
+  "expiryDate": "string",
+  "documentImage": "File" // optional
+}
+```
+- **Headers**: 
+  - Content-Type: multipart/form-data
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Document updated successfully" }
+
+## Navigation APIs
+
+### 28. GET - /api/v1/partner/orders/:id/route
+Returns optimized route for order delivery.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "route": {
+    "distance": 5.2, // km
+    "duration": 25, // minutes
+    "steps": [
+      {
+        "instruction": "Head north on Main St",
+        "distance": 0.5,
+        "duration": 2
+      }
+    ],
+    "polyline": "encoded_polyline_string",
+    "pickupLocation": {
+      "latitude": 19.0544,
+      "longitude": 72.8294
+    },
+    "deliveryLocation": {
+      "latitude": 19.0760,
+      "longitude": 72.8777
+    }
+  }
+}
+```
+
+### 29. GET - /api/v1/partner/orders/:id/navigation-links
+Returns deep links for external navigation apps.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "googleMaps": "https://maps.google.com/maps?daddr=19.0760,72.8777",
+  "appleMaps": "http://maps.apple.com/?daddr=19.0760,72.8777",
+  "pickupAddress": "Shop 15, Linking Road, Bandra West",
+  "deliveryAddress": "123 Main St, Apartment 4B"
+}
+```
+
+## Support APIs
+
+### 30. GET - /api/v1/partner/support/faq
+Returns frequently asked questions.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: Content-Type: application/json
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "faqs": [
+    {
+      "id": "faq_1",
+      "question": "How do I update my bank details?",
+      "answer": "Go to Profile > Bank Details and add your account information.",
+      "category": "payments"
+    }
+  ]
+}
+```
+
+### 31. POST - /api/v1/partner/support/ticket
+Creates support ticket.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "subject": "string",
+  "description": "string",
+  "category": "string", // payment, technical, order, account
+  "priority": "string", // low, medium, high
+  "images": ["string"] // optional
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 201
+  - Content: { "message": "Support ticket created", "ticketId": "ticket_123" }
+
+### 32. GET - /api/v1/partner/support/tickets
+Returns partner's support tickets.
+- **URL Params**: 
+  - Optional: page=[number], limit=[number], status=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: 
+```json
+{
+  "tickets": [
+    {
+      "id": "ticket_123",
+      "subject": "Payment issue",
+      "status": "open", // open, in_progress, resolved, closed
+      "priority": "high",
+      "createdAt": "2025-11-29T10:00:00Z",
+      "lastReply": "2025-11-29T12:00:00Z"
+    }
+  ],
+  "pagination": {<pagination_object>}
+}
+```
+
+## Analytics APIs
+
+### 33. GET - /api/v1/partner/analytics/performance
+Returns partner performance metrics.
+- **URL Params**: 
+  - Optional: period=[string] (week, month, quarter)
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "metrics": {
+    "totalDeliveries": 312,
+    "successRate": 98.5,
+    "averageRating": 4.8,
+    "onTimeDeliveries": 95.2,
+    "averageDeliveryTime": 23, // minutes
+    "totalEarnings": 28540.00,
+    "averageEarningsPerDelivery": 91.47
+  },
+  "trends": {
+    "deliveriesGrowth": 12.5, // percentage
+    "earningsGrowth": 15.2,
+    "ratingTrend": 0.2
+  }
+}
+```
+
+### 34. GET - /api/v1/partner/analytics/ratings
+Returns partner ratings and reviews.
+- **URL Params**: 
+  - Optional: page=[number], limit=[number]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "ratings": [
+    {
+      "orderId": "order_123",
+      "customerName": "John D.",
+      "rating": 5,
+      "review": "Very fast delivery, professional service",
+      "date": "2025-11-29T10:00:00Z"
+    }
+  ],
+  "summary": {
+    "averageRating": 4.8,
+    "totalRatings": 245,
+    "ratingDistribution": {
+      "5": 180,
+      "4": 45,
+      "3": 15,
+      "2": 3,
+      "1": 2
+    }
+  },
+  "pagination": {<pagination_object>}
+}
+```
+
+## Notification APIs
+
+### 35. GET - /api/v1/partner/notifications
+Returns partner notifications.
+- **URL Params**: 
+  - Optional: page=[number], limit=[number], type=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "notifications": [
+    {
+      "id": "notif_123",
+      "type": "new_order", // new_order, payment_received, rating_received, system_update
+      "title": "New Order Available",
+      "message": "Order #ORD-2025-001234 is available for pickup",
+      "data": {
+        "orderId": "order_123"
+      },
+      "isRead": false,
+      "createdAt": "2025-11-29T10:00:00Z"
+    }
+  ],
+  "unreadCount": 5,
+  "pagination": {<pagination_object>}
+}
+```
+
+### 36. PUT - /api/v1/partner/notifications/:id/read
+Marks notification as read.
+- **URL Params**: Required: id=[string]
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Notification marked as read" }
+
+### 37. PUT - /api/v1/partner/notifications/read-all
+Marks all notifications as read.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "All notifications marked as read" }
+
+## Settings APIs
+
+### 38. GET - /api/v1/partner/settings
+Returns partner app settings.
+- **URL Params**: None
+- **Data Params**: None
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content:
+```json
+{
+  "settings": {
+    "notifications": {
+      "newOrders": true,
+      "payments": true,
+      "ratings": true,
+      "promotions": false
+    },
+    "privacy": {
+      "shareLocation": true,
+      "showPhone": true
+    },
+    "preferences": {
+      "language": "en",
+      "currency": "INR",
+      "distanceUnit": "km"
+    }
+  }
+}
+```
+
+### 39. PUT - /api/v1/partner/settings
+Updates partner app settings.
+- **URL Params**: None
+- **Data Params**:
+```json
+{
+  "notifications": {
+    "newOrders": "boolean",
+    "payments": "boolean",
+    "ratings": "boolean",
+    "promotions": "boolean"
+  },
+  "privacy": {
+    "shareLocation": "boolean",
+    "showPhone": "boolean"
+  },
+  "preferences": {
+    "language": "string",
+    "currency": "string",
+    "distanceUnit": "string"
+  }
+}
+```
+- **Headers**: 
+  - Content-Type: application/json
+  - Authorization: Bearer <OAuth Token>
+- **Success Response**:
+  - Code: 200
+  - Content: { "message": "Settings updated successfully" }
+
+## Common Response Objects
+
+### Pagination Object
+```json
+{
+  "currentPage": 1,
+  "totalPages": 10,
+  "totalItems": 95,
+  "itemsPerPage": 10,
+  "hasNextPage": true,
+  "hasPrevPage": false
+}
+```
+
+### Error Response Format
+```json
+{
+  "success": false,
+  "error": "Error message",
+  "code": "ERROR_CODE", // optional
+  "details": {} // optional additional details
+}
+```
+
+## Notes
+
+- All authenticated endpoints require `Authorization: Bearer <token>` header
+- All timestamps are in ISO 8601 format (UTC)
+- File uploads use `multipart/form-data` content type
+- Location coordinates are in [longitude, latitude] format
+- All monetary amounts are in INR (Indian Rupees)
+- Phone numbers are 10-digit Indian mobile numbers
+- OTP expires in 5 minutes
+- JWT tokens expire in 24 hours
+- Refresh tokens expire in 30 days
