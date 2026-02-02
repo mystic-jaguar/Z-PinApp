@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Alert,
+  Image,
 } from "react-native"
 import { COLORS } from "../constants/theme"
 import { useAuth } from "../context/AuthContext"
@@ -117,10 +118,10 @@ export default function SignupScreen({ navigation }: any) {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>ZP</Text>
+            <Image source={require("../../assets/icon.png")} style={styles.logoImage} />
           </View>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join Z-Pin Delivery Partners</Text>
+          <Text style={styles.subtitle}>Join ZPIN Delivery Partners</Text>
         </View>
 
         <View style={styles.form}>
@@ -277,12 +278,6 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    justifyContent: "center",
-    alignItems: "center",
     marginBottom: 16,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
@@ -290,10 +285,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  logoText: {
-    color: COLORS.secondary,
-    fontSize: 28,
-    fontWeight: "bold",
+  logoImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
   },
   title: {
     fontSize: 26,

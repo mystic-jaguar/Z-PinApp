@@ -24,7 +24,7 @@ const mockOrders: Order[] = [
     pickupLocation: {
       latitude: 28.6139,
       longitude: 77.209,
-      address: "Z-Pin Warehouse, Connaught Place",
+      address: "ZPIN Warehouse, Connaught Place",
       landmark: "Near Metro Station",
     },
     deliveryLocation: {
@@ -52,7 +52,7 @@ const mockOrders: Order[] = [
     pickupLocation: {
       latitude: 28.62,
       longitude: 77.21,
-      address: "Z-Pin Store, Karol Bagh",
+      address: "ZPIN Store, Karol Bagh",
       landmark: "Main Market",
     },
     deliveryLocation: {
@@ -79,7 +79,7 @@ const mockOrders: Order[] = [
     pickupLocation: {
       latitude: 28.61,
       longitude: 77.205,
-      address: "Z-Pin Hub, Nehru Place",
+      address: "ZPIN Hub, Nehru Place",
       landmark: "Near Bus Stand",
     },
     deliveryLocation: {

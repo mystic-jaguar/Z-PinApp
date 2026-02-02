@@ -53,6 +53,7 @@
     "expo": "latest",
     "expo-font": "latest",
     "expo-image-picker": "17.0.10",
+    "expo-keep-awake": "~15.0.8",
     "expo-status-bar": "3.0.9",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",

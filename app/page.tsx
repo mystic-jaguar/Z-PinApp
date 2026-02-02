@@ -77,7 +77,7 @@ export default function Page() {
         <Badge className="mb-4 bg-amber-600 text-white hover:bg-amber-600">React Native</Badge>
         <h1 className="text-4xl font-bold text-amber-950 md:text-5xl">Delivery Partner App</h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-amber-900">
-          A Z-Pin-style delivery partner application built with React Native and Expo
+          A ZPIN-style delivery partner application built with React Native and Expo
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Button size="lg" className="bg-amber-950 hover:bg-amber-900">

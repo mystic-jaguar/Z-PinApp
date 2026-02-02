@@ -11,6 +11,7 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native"
 import { COLORS } from "../constants/theme"
 import { useAuth } from "../context/AuthContext"
@@ -65,9 +66,9 @@ export default function LoginScreen({ navigation }: any) {
       <View style={styles.inner}>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>ZP</Text>
+            <Image source={require("../../assets/icon.png")} style={styles.logoImage} />
           </View>
-          <Text style={styles.title}>Z-Pin Delivery</Text>
+          <Text style={styles.title}>ZPIN Delivery</Text>
           <Text style={styles.subtitle}>Partner Application</Text>
         </View>
 
@@ -142,12 +143,6 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    justifyContent: "center",
-    alignItems: "center",
     marginBottom: 16,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
@@ -155,10 +150,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  logoText: {
-    color: COLORS.secondary,
-    fontSize: 32,
-    fontWeight: "bold",
+  logoImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
   },
   title: {
     fontSize: 28,

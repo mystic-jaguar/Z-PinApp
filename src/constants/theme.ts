@@ -1,5 +1,5 @@
 export const COLORS = {
-  primary: "#F7C31F", // Z-Pin yellow
+  primary: "#F7C31F", // ZPIN yellow
   primaryDark: "#E5B31C",
   secondary: "#1A1A2E", // Dark navy
   background: "#F5F5F5",

@@ -1,4 +1,4 @@
-Z-PIN DELIVERY PARTNER APP - INFORMATION REFERENCE GUIDE
+ZPIN DELIVERY PARTNER APP - INFORMATION REFERENCE GUIDE
 ========================================================
 
 This document provides detailed information about which functions, components, and values reference which files throughout the entire project.
@@ -384,4 +384,4 @@ Based on the API documentation, the following screens will integrate with backen
 - DocumentsScreen.tsx → POST /api/v1/partner/documents
 - BankAccountScreen.tsx → GET /api/v1/partner/bank-accounts
 
-This information guide provides a complete reference for understanding the codebase structure, dependencies, and data flow throughout the Z-Pin delivery partner application.
+This information guide provides a complete reference for understanding the codebase structure, dependencies, and data flow throughout the ZPIN delivery partner application.
